@@ -28,14 +28,8 @@
       gap: 8px;
       margin-bottom: 15px;
     }
-    iframe {
-      width: 100%;
-      height: 75vh;
-      min-height: 500px;
-      border: none;
-      background: #000;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    .back-btn:hover {
+      color: #ff8533;
     }
     .player-title {
       font-size: 1.9rem;
@@ -46,6 +40,22 @@
       margin-bottom: 20px;
       font-size: 1.1rem;
     }
+    .iframe-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      background: #000;
+      border-radius: 8px;
+    }
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -55,59 +65,61 @@
     <h1 class="player-title" id="title">Loading...</h1>
     <p class="episode-info" id="episodeInfo"></p>
 
-    <iframe id="videoFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    <div class="iframe-container">
+      <iframe id="videoFrame" allowfullscreen allow="encrypted-media"></iframe>
+    </div>
   </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     
     const title = decodeURIComponent(urlParams.get('title') || 'Watching');
-    const tmdbId = urlParams.get('id');
+    const id = urlParams.get('id');
     const type = urlParams.get('type');
     const season = urlParams.get('season');
     const episode = urlParams.get('episode');
 
-    // Set page title and info
+    // Set titles
     document.getElementById('title').textContent = title;
     
     if (type === 'tv' && season && episode) {
       document.getElementById('episodeInfo').textContent = `Season ${season} • Episode ${episode}`;
     }
 
-    // Build AnyEmbed URL
+    // Build VidCore URL
     let embedUrl = '';
-
+    
     if (type === 'tv' && season && episode) {
-      embedUrl = `https://anyembed.com/embed/tmdb-tv-${tmdbId}-${season}-${episode}`;
+      embedUrl = `https://vidcore.net/tv/${id}/${season}/${episode}`;
     } 
     else if (type === 'tv') {
-      embedUrl = `https://anyembed.com/embed/tmdb-tv-${tmdbId}-1-1`;
+      embedUrl = `https://vidcore.net/tv/${id}/1/1`;
     } 
     else {
-      embedUrl = `https://anyembed.com/embed/tmdb-movie-${tmdbId}`;
+      embedUrl = `https://vidcore.net/movie/${id}`;
     }
 
-    // Load the player
+    // Load iframe
     document.getElementById('videoFrame').src = embedUrl;
 
     // Save to Continue Watching
-    function saveProgress() {
+    function saveToContinue() {
       if (typeof addToContinueWatching === 'function') {
         addToContinueWatching({
-          id: parseInt(tmdbId),
+          id: parseInt(id),
           type: type,
           title: title,
           season: season ? parseInt(season) : null,
           episode: episode ? parseInt(episode) : null,
-          progress: 30,        // You can improve this later with real progress
+          progress: 25,
           poster_path: ''
         });
       }
     }
 
-    // Auto save when player loads
+    // Auto save after 5 seconds
     window.addEventListener('load', () => {
-      setTimeout(saveProgress, 3000);
+      setTimeout(saveToContinue, 5000);
     });
   </script>
 </body>
