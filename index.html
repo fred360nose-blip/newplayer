@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambridge HOTmaths</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .blocked-page {
+      background: #ffffff;
+      color: #000000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .blocked-container {
+      max-width: 680px;
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
+    .briefcase-img {
+      width: 92px;
+      height: auto;
+      flex-shrink: 0;
+      cursor: pointer;
+      user-select: none;
+      margin-top: 8px;
+    }
+
+    .content-area {
+      text-align: left;
+    }
+
+    .blocked-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+
+    .hosted {
+      font-size: 18px;
+      color: #444444;
+      margin-bottom: 25px;
+    }
+
+    .blocked-text {
+      font-size: 15.2px;
+      line-height: 1.55;
+      color: #222222;
+      margin-bottom: 35px;
+    }
+
+    .support-link {
+      color: #0066cc;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .btn-close {
+      background: #f1f1f1;
+      color: #000;
+      border: 1px solid #c0c0c0;
+      padding: 9px 28px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .btn-close:hover {
+      background: #e5e5e5;
+    }
+
+    .footer {
+      margin-top: 70px;
+      font-size: 13.5px;
+      color: #666666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Microsoft Defender Blocked Page -->
+  <div class="blocked-page" id="blockedScreen">
+    <div class="blocked-container">
+      <!-- Briefcase Image -->
+      <img src="briefcase.png" alt="Briefcase" class="briefcase-img" onclick="enterSite()">
+
+      <!-- Text Content -->
+      <div class="content-area">
+        <div class="blocked-title">This content is blocked by your organisation</div>
+        <div class="hosted">Hosted by www.joeisjewish.xyz</div>
+        
+        <div class="blocked-text">
+          For your protection, your organisation is not allowing you to access<br>
+          the resource or content hosted by www.joeisjewish.xyz<br><br>
+          To learn more about why you're seeing this message or to get in<br>
+          touch with your administrator, <span class="support-link">visit the support page</span>.
+        </div>
+
+        <button class="btn-close" onclick="closePage()">Close page</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Fredflix Site -->
+  <div id="mainSite" style="display: none;">
+    <div class="header">
+      <div class="logo" onclick="window.location.reload()">Hotmaths</div>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search movies & shows...">
+      </div>
+    </div>
+
+    <div id="mainContent" class="content"></div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <script>
+    function enterSite() {
+      document.getElementById('blockedScreen').style.display = 'none';
+      document.getElementById('mainSite').style.display = 'block';
+      
+      if (typeof loadInitialContent === 'function') {
+        loadInitialContent();
+      }
+    }
+
+    function closePage() {
+      window.close();
+      document.body.innerHTML = `
+        <div style="text-align:center; margin-top:150px; font-family:Arial,sans-serif; color:#333;">
+          <h2>Page closed</h2>
+          <p>You can now close this tab.</p>
+        </div>`;
+    }
+
+    document.addEventListener('keypress', (e) => {
+      if (e.key === "Enter") enterSite();
+    });
+  </script>
+</body>
+</html>
