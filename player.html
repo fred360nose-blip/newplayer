@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>fredflix - Player</title>
+  <title>Cambridge Hotmaths</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
@@ -28,21 +28,31 @@
       gap: 8px;
       margin-bottom: 15px;
     }
-    .back-btn:hover {
-      color: #ff8533;
-    }
     .player-title {
       font-size: 1.9rem;
-      margin: 15px 0 5px 0;
+      margin: 10px 0 8px 0;
     }
     .episode-info {
       color: #aaa;
+      margin-bottom: 15px;
+    }
+    .selector {
       margin-bottom: 20px;
-      font-size: 1.1rem;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    select {
+      background: #222;
+      color: white;
+      border: 1px solid #444;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 1rem;
     }
     .iframe-container {
       position: relative;
-      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
       background: #000;
@@ -65,42 +75,82 @@
     <h1 class="player-title" id="title">Loading...</h1>
     <p class="episode-info" id="episodeInfo"></p>
 
+    <!-- Season & Episode Selector (for TV only) -->
+    <div class="selector" id="selectorContainer" style="display: none;">
+      <select id="seasonSelect"></select>
+      <select id="episodeSelect"></select>
+    </div>
+
     <div class="iframe-container">
       <iframe id="videoFrame" allowfullscreen allow="encrypted-media"></iframe>
     </div>
   </div>
 
   <script>
+    document.title = "Cambridge Hotmaths";   // Tab title
+
     const urlParams = new URLSearchParams(window.location.search);
     
     const title = decodeURIComponent(urlParams.get('title') || 'Watching');
     const id = urlParams.get('id');
     const type = urlParams.get('type');
-    const season = urlParams.get('season');
-    const episode = urlParams.get('episode');
+    let season = parseInt(urlParams.get('season')) || 1;
+    let episode = parseInt(urlParams.get('episode')) || 1;
 
-    // Set titles
     document.getElementById('title').textContent = title;
-    
-    if (type === 'tv' && season && episode) {
-      document.getElementById('episodeInfo').textContent = `Season ${season} • Episode ${episode}`;
+
+    const selectorContainer = document.getElementById('selectorContainer');
+    const seasonSelect = document.getElementById('seasonSelect');
+    const episodeSelect = document.getElementById('episodeSelect');
+
+    // Load VidCore Player
+    function loadPlayer() {
+      let embedUrl = '';
+      if (type === 'tv') {
+        embedUrl = `https://vidcore.net/tv/${id}/${season}/${episode}`;
+      } else {
+        embedUrl = `https://vidcore.net/movie/${id}`;
+      }
+      document.getElementById('videoFrame').src = embedUrl;
     }
 
-    // Build VidCore URL
-    let embedUrl = '';
-    
-    if (type === 'tv' && season && episode) {
-      embedUrl = `https://vidcore.net/tv/${id}/${season}/${episode}`;
-    } 
-    else if (type === 'tv') {
-      embedUrl = `https://vidcore.net/tv/${id}/1/1`;
-    } 
-    else {
-      embedUrl = `https://vidcore.net/movie/${id}`;
+    // For TV Shows - Show Season/Episode Selector
+    if (type === 'tv') {
+      selectorContainer.style.display = 'flex';
+      
+      // Simple selector (you can expand this later with real episode list)
+      seasonSelect.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Season ${i}`;
+        if (i === season) opt.selected = true;
+        seasonSelect.appendChild(opt);
+      }
+
+      episodeSelect.innerHTML = '';
+      for (let i = 1; i <= 20; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Episode ${i}`;
+        if (i === episode) opt.selected = true;
+        episodeSelect.appendChild(opt);
+      }
+
+      // Change episode
+      seasonSelect.addEventListener('change', () => {
+        season = parseInt(seasonSelect.value);
+        loadPlayer();
+      });
+
+      episodeSelect.addEventListener('change', () => {
+        episode = parseInt(episodeSelect.value);
+        loadPlayer();
+      });
     }
 
-    // Load iframe
-    document.getElementById('videoFrame').src = embedUrl;
+    // Initial load
+    loadPlayer();
 
     // Save to Continue Watching
     function saveToContinue() {
@@ -109,17 +159,16 @@
           id: parseInt(id),
           type: type,
           title: title,
-          season: season ? parseInt(season) : null,
-          episode: episode ? parseInt(episode) : null,
-          progress: 25,
+          season: type === 'tv' ? season : null,
+          episode: type === 'tv' ? episode : null,
+          progress: 30,
           poster_path: ''
         });
       }
     }
 
-    // Auto save after 5 seconds
     window.addEventListener('load', () => {
-      setTimeout(saveToContinue, 5000);
+      setTimeout(saveToContinue, 4000);
     });
   </script>
 </body>
